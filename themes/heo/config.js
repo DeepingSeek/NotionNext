@@ -81,66 +81,66 @@ const CONFIG = {
     {
       title_1: 'OpenAI',
       img_1: '/images/heo/openai.webp',
-      color_1: '#10a37f',
+      color_1: '#e8f7f1',
       title_2: 'Claude Code',
       img_2: '/images/heo/claudecode-color.webp',
-      color_2: '#cc785c'
+      color_2: '#fbeee8'
     },
     {
       title_1: 'Microsoft Azure',
       img_1: '/images/heo/azure-color.webp',
-      color_1: '#0078d4',
+      color_1: '#e6f1fb',
       title_2: 'Azure AI Foundry',
       img_2: '/images/heo/azureai-color.webp',
-      color_2: '#005ef0'
+      color_2: '#e9eefc'
     },
     {
       title_1: 'Grok',
       img_1: '/images/heo/grok.webp',
-      color_1: '#00ccbc',
+      color_1: '#f1f5f9',
       title_2: 'Gemini',
       img_2: '/images/heo/gemini-color.webp',
-      color_2: '#4285f4'
+      color_2: '#e8f0fe'
     },
     {
       title_1: 'Qwen',
       img_1: '/images/heo/qwen-color.webp',
-      color_1: '#ff6b35',
+      color_1: '#efeafc',
       title_2: 'DeepSeek',
       img_2: '/images/heo/deepseek-color.webp',
-      color_2: '#2563eb'
+      color_2: '#e6eefc'
     },
     {
       title_1: 'Cursor',
       img_1: '/images/heo/cursor.webp',
-      color_1: '#5e6ad2',
+      color_1: '#eeeeee',
       title_2: 'GitHub Copilot',
       img_2: '/images/heo/copilot-color.webp',
-      color_2: '#2ea043'
+      color_2: '#e9f7ec'
     },
     {
       title_1: 'MCP',
       img_1: '/images/heo/mcp.webp',
-      color_1: '#1d55ff',
+      color_1: '#eef2ff',
       title_2: '豆包',
       img_2: '/images/heo/doubao-color.webp',
-      color_2: '#ff7d00'
+      color_2: '#fff3e6'
     },
     {
       title_1: 'Ollama',
       img_1: '/images/heo/ollama.webp',
-      color_1: '#000000',
+      color_1: '#f1f1f1',
       title_2: 'Hugging Face',
       img_2: '/images/heo/huggingface-color.webp',
-      color_2: '#ff9d00'
+      color_2: '#fff7e0'
     },
     {
       title_1: 'AWS',
       img_1: '/images/heo/aws-color.webp',
-      color_1: '#ff9900',
+      color_1: '#fff4e5',
       title_2: 'Notion',
       img_2: '/images/heo/notion.webp',
-      color_2: '#3f3f3f'
+      color_2: '#f3f4f6'
     }
   ],
 
