@@ -2,10 +2,10 @@
 
 # 月明的博客
 
-基于 NotionNext 与 Notion 搭建的个人博客，在线访问：[moonbright.eu.cc](https://moonbright.eu.cc)
+基于 NotionNext 与 Notion 搭建的个人博客，在线访问：[lunalight.top](https://lunalight.top)
 
 <p>
-  <a href="https://moonbright.eu.cc">访问博客</a>
+  <a href="https://lunalight.top">访问博客</a>
   ·
   <a href="https://github.com/DeepingSeek/NotionNext">GitHub 仓库</a>
   ·
@@ -57,14 +57,14 @@ yarn export     # 静态导出（会同时生成 sitemap）
 2. **站长验证**：在环境变量中填写验证码
    - `NEXT_PUBLIC_SEO_GOOGLE_SITE_VERIFICATION`
    - `NEXT_PUBLIC_SEO_BAIDU_SITE_VERIFICATION`
-3. **Sitemap / robots.txt**：由 `pages/sitemap.xml.js` 与 `lib/utils/robots.txt.js` 自动生成，地址为 `https://moonbright.eu.cc/sitemap.xml`。
+3. **Sitemap / robots.txt**：由 `pages/sitemap.xml.js` 与 `lib/utils/robots.txt.js` 自动生成，地址为 `https://lunalight.top/sitemap.xml`。
 4. **提交收录**：在 Google Search Console 与百度搜索资源平台提交上述 Sitemap。
 
 ## 部署
 
 1. 复制 Notion 模板并获取页面 ID，填入环境变量 `NOTION_PAGE_ID`。
 2. Fork 本仓库，在 Vercel 中导入并部署，Node 版本设置为 22。
-3. 在 Vercel 中绑定自定义域名 `moonbright.eu.cc`。
+3. 在 Vercel 中绑定自定义域名 `lunalight.top`。
 
 ## 致谢
 
