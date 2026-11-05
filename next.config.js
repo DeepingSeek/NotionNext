@@ -32,6 +32,17 @@ const locales = (function () {
   return langs
 })()
 
+// 语言前缀 → 独立域名（同一个 Vercel 项目多域名绑定，只构建一次）。
+// 仅当 NOTION_PAGE_ID 中存在对应前缀（如 docs:xxx）时生效，否则不产生任何 domains 配置。
+const LOCALE_DOMAINS = { docs: 'docs.lunalight.top' }
+const i18nDomains = locales
+  .filter(locale => LOCALE_DOMAINS[locale])
+  .map(locale => ({
+    domain: LOCALE_DOMAINS[locale],
+    defaultLocale: locale,
+    locales: [locale]
+  }))
+
 // next dev 时配置可能被多个 worker 各自加载一次，globalThis 无法跨进程去重；用独占文件锁只打印一行。
 ;(function printDevCacheHint() {
   if (process.env.npm_lifecycle_event !== 'dev') return
@@ -221,7 +232,9 @@ const nextConfig = {
     : {
       defaultLocale: BLOG.LANG,
       // 支持的所有多语言,按需填写即可
-      locales: locales
+      locales: locales,
+      // 绑定独立域名的语言（见上方 LOCALE_DOMAINS）
+      ...(i18nDomains.length ? { domains: i18nDomains } : {})
     },
   images: {
     // 图片压缩和格式优化
