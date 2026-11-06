@@ -107,14 +107,19 @@ export async function getStaticProps(req) {
     process.env.npm_lifecycle_event
   )
   if (isBuildLifecycle) {
-    // 生成robotTxt
-    generateRobotsTxt(props)
+    const isDefaultLocale = shouldGenerateRssForLocale({ locale })
+    // robots.txt / sitemap.xml 写入同一个 public 目录，只允许默认语言（主站）生成，
+    // 否则文档站(docs)的构建会用 docs 域名覆盖主站的文件
+    if (isDefaultLocale) {
+      // 生成robotTxt
+      generateRobotsTxt(props)
+      // 生成sitemap
+      generateSitemapXml(props)
+    }
     // 生成Feed订阅
-    if (shouldGenerateRssForLocale({ locale })) {
+    if (isDefaultLocale) {
       await generateRss(props)
     }
-    // 生成
-    generateSitemapXml(props)
     // 检查数据是否需要从algolia删除
     await checkDataFromAlgolia(props)
     if (siteConfig('UUID_REDIRECT', false, props?.NOTION_CONFIG)) {

@@ -31,7 +31,7 @@
 | `https://www.lunalight.top/` | 200，页面为 heo 主题 |
 | `https://lunalight.top/` | 308 跳转到 `https://www.lunalight.top/` |
 
-**待确认的问题：** 裸域名 `lunalight.top` 当前跳转到 `www`。DOMAIN_MIGRATION.md 阶段 A3 的计划是 `www` 跳转到裸域名 `lunalight.top`，两者方向相反。这个问题与 docs 站无关。请在 Vercel → Settings → Domains 中核对 `lunalight.top` 与 `www.lunalight.top` 的 Redirect 设置，确认哪个是主域名。
+**规范域名（已决定）：** 以 `www.lunalight.top` 为主域名。Vercel 中 `lunalight.top` 与 `moonbright.eu.cc` 均 308 跳转到 `www`。DOMAIN_MIGRATION.md 阶段 A3 原计划的"裸域名为主"已作废。sitemap、robots.txt、canonical 都应使用 `www`。
 
 ---
 
@@ -127,7 +127,7 @@ NOTION_PAGE_ID = 32d70d5879c883dfbadc81e39bca06f0,docs:6e670d5879c8839d844901b77
 |---|---|
 | `THEME` | `heo` |
 
-这样主站的主题只由 Notion 决定，不依赖 Vercel 环境变量。`LINK` 确认为 `https://lunalight.top/`（DOMAIN_MIGRATION 第 6 项已改）。
+这样主站的主题只由 Notion 决定，不依赖 Vercel 环境变量。`LINK` 设为 `https://www.lunalight.top`（规范域名，与 Vercel 主域名一致）。
 
 可选：主库 `HEO_NOTICE_BAR` 中指向文档的那一条链接，改为 `https://docs.lunalight.top/`。DOMAIN_MIGRATION 第 12 项当时指向主站，是因为 docs 子域当时停用。
 
