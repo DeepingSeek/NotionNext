@@ -1,8 +1,13 @@
 import { siteConfig } from '@/lib/config'
 import { useGlobal } from '@/lib/global'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import CONFIG from '../config'
+import {
+  buildNavTree,
+  collectFolderIds,
+  findActiveFolderIds
+} from '../navTree'
 import BlogPostCard from './BlogPostCard'
 import NavPostItem from './NavPostItem'
 
@@ -18,13 +23,28 @@ const NavPostList = props => {
   const { locale, currentSearch } = useGlobal()
   const router = useRouter()
 
-  // 按分类将文章分组成文件夹
-  const categoryFolders = groupArticles(filteredNavPages)
+  // 层级配置：分隔符与最大层级（见 config.js）
+  const separator = siteConfig('GITBOOK_CATEGORY_SEPARATOR', '>', CONFIG)
+  const maxDepth = siteConfig('GITBOOK_NAV_MAX_DEPTH', 4, CONFIG)
+  const AUTO_SORT = siteConfig('GITBOOK_AUTO_SORT', true, CONFIG)
+  const order = siteConfig('GITBOOK_CATEGORY_ORDER', [], CONFIG)
 
-  // 存放被展开的分组
-  const [expandedGroups, setExpandedGroups] = useState([])
+  // 按分类构建导航树（一级 > 二级 > ...）
+  const navTree = useMemo(
+    () =>
+      buildNavTree(filteredNavPages, {
+        separator,
+        maxDepth,
+        autoSort: AUTO_SORT,
+        order
+      }),
+    [filteredNavPages, separator, maxDepth, AUTO_SORT, order]
+  )
 
-  // 是否排他折叠，一次只展开一个文件夹
+  // 存放被展开的文件夹 id
+  const [expandedIds, setExpandedIds] = useState([])
+
+  // 是否排他折叠，同一层级只展开一个文件夹
   const GITBOOK_EXCLUSIVE_COLLAPSE = siteConfig(
     'GITBOOK_EXCLUSIVE_COLLAPSE',
     null,
@@ -32,46 +52,55 @@ const NavPostList = props => {
   )
 
   useEffect(() => {
-    // 展开文件夹
-    setTimeout(() => {
+    // 展开当前文章所在的整条路径；找不到则展开第一个文件夹
+    const timer = setTimeout(() => {
       const currentPath = decodeURIComponent(router.asPath.split('?')[0])
-      const defaultOpenIndex = getDefaultOpenIndexByPath(
-        categoryFolders,
-        currentPath
+      const activeIds = findActiveFolderIds(
+        navTree,
+        post => currentPath === post.href
       )
-      setExpandedGroups([defaultOpenIndex])
+      const firstFolder = navTree.entries.find(
+        e => e.type === 'folder' && !e.plain
+      )
+      setExpandedIds(
+        activeIds.length > 0 ? activeIds : firstFolder ? [firstFolder.id] : []
+      )
     }, 500)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router, filteredNavPages])
+    return () => clearTimeout(timer)
+  }, [router, navTree])
 
-  // 折叠项切换，当折叠或展开数组时会调用
-  const toggleItem = index => {
-    let newExpandedGroups = [...expandedGroups] // 创建一个新的展开分组数组
+  // 折叠项切换：node 为被点击的文件夹，siblings 为同级文件夹
+  const toggleFolder = (node, siblings) => {
+    setExpandedIds(prev => {
+      if (prev.includes(node.id)) {
+        return prev.filter(id => id !== node.id)
+      }
+      let next = prev
+      if (GITBOOK_EXCLUSIVE_COLLAPSE) {
+        // 排他：关闭同级其它文件夹及其子孙
+        const drop = new Set()
+        siblings.forEach(sibling => {
+          if (sibling.id === node.id) return
+          drop.add(sibling.id)
+          collectFolderIds(sibling).forEach(id => drop.add(id))
+        })
+        next = prev.filter(id => !drop.has(id))
+      }
+      return [...next, node.id]
+    })
+  }
 
-    // 如果expandedGroups中不存在，增加入，若存在则移除
-    if (expandedGroups.includes(index)) {
-      // 如果expandedGroups中包含index，则移除index
-      newExpandedGroups = newExpandedGroups.filter(
-        expandedIndex => expandedIndex !== index
-      )
-    } else {
-      // 如果expandedGroups中不包含index，则加入index
-      newExpandedGroups.push(index)
-    }
-    // 是否排他
-    if (GITBOOK_EXCLUSIVE_COLLAPSE) {
-      // 如果折叠菜单排他性为 true，则只展开当前分组，关闭其他已展开的分组
-      newExpandedGroups = newExpandedGroups.filter(
-        expandedIndex => expandedIndex === index
-      )
-    }
+  // 如果href
+  const href = siteConfig('GITBOOK_INDEX_PAGE') + ''
 
-    // 更新展开分组数组
-    setExpandedGroups(newExpandedGroups)
+  const homePost = {
+    id: '-1',
+    title: siteConfig('DESCRIPTION'),
+    href: href.indexOf('/') !== 0 ? '/' + href : href
   }
 
   // 空数据返回
-  if (!categoryFolders || categoryFolders.length === 0) {
+  if (!navTree.entries || navTree.entries.length === 0) {
     // 空白内容
     return (
       <div className='flex w-full items-center justify-center min-h-screen mx-auto md:-mt-20'>
@@ -82,14 +111,31 @@ const NavPostList = props => {
       </div>
     )
   }
-  // 如果href
-  const href = siteConfig('GITBOOK_INDEX_PAGE') + ''
 
-  const homePost = {
-    id: '-1',
-    title: siteConfig('DESCRIPTION'),
-    href: href.indexOf('/') !== 0 ? '/' + href : href
+  // 搜索结果：平铺列表，每条显示完整分类路径
+  if (currentSearch) {
+    return (
+      <div
+        id='posts-wrapper'
+        className='w-full flex-grow space-y-0.5 pr-4 tracking-wider'>
+        <BlogPostCard className='mb-4' post={homePost} />
+        {(filteredNavPages || []).filter(Boolean).map((post, index) => (
+          <div key={post.id || index}>
+            {post.category && (
+              <div className='ml-3 text-xs text-gray-400 dark:text-gray-500'>
+                {post.category}
+              </div>
+            )}
+            <BlogPostCard className='text-md py-2' post={post} />
+          </div>
+        ))}
+      </div>
+    )
   }
+
+  const topFolders = navTree.entries.filter(
+    e => e.type === 'folder' && !e.plain
+  )
 
   return (
     <div
@@ -99,67 +145,24 @@ const NavPostList = props => {
       <BlogPostCard className='mb-4' post={homePost} />
 
       {/* 文章列表 */}
-      {categoryFolders?.map((group, index) => (
-        <NavPostItem
-          key={index}
-          group={group}
-          onHeightChange={props.onHeightChange}
-          expanded={expandedGroups.includes(index)} // 将展开状态传递给子组件
-          toggleItem={() => toggleItem(index)} // 将切换函数传递给子组件
-        />
-      ))}
+      {navTree.entries.map((entry, index) =>
+        entry.type === 'folder' ? (
+          <NavPostItem
+            key={entry.id || index}
+            node={entry}
+            expandedIds={expandedIds}
+            onToggle={toggleFolder}
+            siblings={topFolders}
+            onHeightChange={props.onHeightChange}
+          />
+        ) : (
+          <div key={index}>
+            <BlogPostCard className='text-md py-2' post={entry.post} />
+          </div>
+        )
+      )}
     </div>
   )
 }
 
-// 按照分类将文章分组成文件夹
-function groupArticles(filteredNavPages) {
-  if (!filteredNavPages) {
-    return []
-  }
-  const groups = []
-  const AUTO_SORT = siteConfig('GITBOOK_AUTO_SORT', true, CONFIG)
-
-  for (let i = 0; i < filteredNavPages.length; i++) {
-    const item = filteredNavPages[i]
-    const categoryName = item?.category ? item?.category : '' // 将category转换为字符串
-
-    let existingGroup = null
-    // 开启自动分组排序；将同分类的自动归到同一个文件夹，忽略Notion中的排序
-    if (AUTO_SORT) {
-      existingGroup = groups.find(group => group.category === categoryName) // 搜索同名的最后一个分组
-    } else {
-      existingGroup = groups[groups.length - 1] // 获取最后一个分组
-    }
-
-    // 添加数据
-    if (existingGroup && existingGroup.category === categoryName) {
-      existingGroup.items.push(item)
-    } else {
-      groups.push({ category: categoryName, items: [item] })
-    }
-  }
-  return groups
-}
-
-/**
- * 查看当前路由需要展开的菜单索引
- * 路过都没有，则返回0，即默认展开第一个
- * @param {*} categoryFolders
- * @param {*} path
- * @returns {number} 返回需要展开的菜单索引
- */
-function getDefaultOpenIndexByPath(categoryFolders, path) {
-  // 查找满足条件的第一个索引
-  const index = categoryFolders.findIndex(group => {
-    return group.items.some(post => path === post.href)
-  })
-
-  // 如果找到满足条件的索引，则设置为该索引
-  if (index !== -1) {
-    return index
-  }
-
-  return 0
-}
 export default NavPostList

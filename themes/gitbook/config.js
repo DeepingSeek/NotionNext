@@ -19,6 +19,30 @@ const CONFIG = {
 
   GITBOOK_FOLDER_HOVER_EXPAND: false, // 左侧导航文件夹鼠标悬停时自动展开；若为false，则要点击才能展开
 
+  // 分类层级（一级 > 二级 > ...）
+  GITBOOK_CATEGORY_SEPARATOR: '>', // 层级分隔符，不可为 /
+  GITBOOK_NAV_MAX_DEPTH: 4, // 导航最大层级，超出部分并入最后一级名称
+  // 文件夹显示顺序：按名称匹配，同一父级下排在前面；未列出的保持 Notion 顺序排在后面。
+  // 默认为 Azure AI 文档站的模块顺序（学习路径），以及 Diátaxis 类型顺序。
+  GITBOOK_CATEGORY_ORDER: [
+    '入门',
+    'Microsoft Foundry',
+    'Azure OpenAI',
+    'Azure AI Search',
+    'Foundry Tools',
+    'RAG 与知识工程',
+    '智能体与工具',
+    '评测、观测与安全',
+    '企业架构与成本',
+    '解决方案场景',
+    '样例与学习资源',
+    '附录',
+    '概念解释',
+    '教程',
+    '操作指南',
+    '参考'
+  ],
+
   // Widget
   GITBOOK_WIDGET_REVOLVER_MAPS:
     process.env.NEXT_PUBLIC_WIDGET_REVOLVER_MAPS || 'false', // 地图插件

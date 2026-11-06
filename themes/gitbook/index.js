@@ -35,6 +35,7 @@ import JumpToTopButton from './components/JumpToTopButton'
 import NavPostList from './components/NavPostList'
 import PageNavDrawer from './components/PageNavDrawer'
 import RevolverMaps from './components/RevolverMaps'
+import { summarizeTopLevel } from './navTree'
 import TagItemMini from './components/TagItemMini'
 import CONFIG from './config'
 import { Style } from './style'
@@ -469,6 +470,12 @@ const Layout404 = props => {
 const LayoutCategoryIndex = props => {
   const { categoryOptions } = props
   const { locale } = useGlobal()
+  // 只列一级分类；二级及以下的文章在一级分类页中一并显示
+  const topLevelCategories = summarizeTopLevel(categoryOptions, {
+    separator: siteConfig('GITBOOK_CATEGORY_SEPARATOR', '>', CONFIG),
+    maxDepth: siteConfig('GITBOOK_NAV_MAX_DEPTH', 4, CONFIG),
+    order: siteConfig('GITBOOK_CATEGORY_ORDER', [], CONFIG)
+  })
   return (
     <>
       <div className='bg-white dark:bg-gray-700 py-10'>
@@ -477,7 +484,7 @@ const LayoutCategoryIndex = props => {
           {locale.COMMON.CATEGORY}:
         </div>
         <div id='category-list' className='duration-200 flex flex-wrap'>
-          {categoryOptions?.map(category => {
+          {topLevelCategories.map(category => {
             return (
               <SmartLink
                 key={category.name}
