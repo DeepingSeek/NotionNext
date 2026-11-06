@@ -235,3 +235,27 @@ export function summarizeTopLevel(categoryOptions, options = {}) {
     .sort((a, b) => rankOf(a.item.name, order) - rankOf(b.item.name, order) || a.i - b.i)
     .map(x => x.item)
 }
+
+/**
+ * 切换文件夹的展开状态，返回新的展开 id 数组（纯函数）
+ * - 已展开：收起该文件夹
+ * - 未展开：展开该文件夹；exclusive 为 true 时，先收起同级其它文件夹及其全部子孙，
+ *   并保留祖先路径（祖先不在 siblings 中，不受影响）
+ */
+export function toggleExpandedIds(prev, node, siblings = [], exclusive = false) {
+  if (prev.includes(node.id)) {
+    return prev.filter(id => id !== node.id)
+  }
+  let next = prev
+  if (exclusive) {
+    const drop = new Set()
+    siblings.forEach(sibling => {
+      if (sibling.id === node.id) return
+      drop.add(sibling.id)
+      collectFolderIds(sibling).forEach(id => drop.add(id))
+    })
+    next = prev.filter(id => !drop.has(id))
+  }
+  return [...next, node.id]
+}
+

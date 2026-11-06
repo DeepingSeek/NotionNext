@@ -1,9 +1,43 @@
 import Badge from '@/components/Badge'
-import Collapse from '@/components/Collapse'
 import { siteConfig } from '@/lib/config'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import BlogPostCard from './BlogPostCard'
 import { hasLatestPost } from '../navTree'
+
+/**
+ * 导航折叠容器（仅 gitbook 使用）
+ *
+ * 不使用 components/Collapse：它在展开结束后会把高度固定为像素值（且清除了定时器，
+ * 不会切回 auto），嵌套时父级的固定高度会裁切新展开的子级。
+ * 这里用 grid-template-rows 从 0fr 过渡到 1fr，高度由内容决定，嵌套层级互不影响。
+ */
+const NavCollapse = ({ isOpen, onHeightChange, children }) => {
+  const innerRef = useRef(null)
+
+  useEffect(() => {
+    // 与 Collapse 保持一致：只在展开状态变化时通知父组件（不把回调放入依赖，避免父组件每次渲染都被触发）
+    onHeightChange &&
+      onHeightChange({
+        height: innerRef.current ? innerRef.current.scrollHeight : 0,
+        increase: isOpen
+      })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen])
+
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateRows: isOpen ? '1fr' : '0fr',
+        visibility: isOpen ? 'visible' : 'hidden',
+        transition: 'grid-template-rows 300ms ease, visibility 300ms'
+      }}>
+      <div ref={innerRef} style={{ overflow: 'hidden', minHeight: 0 }}>
+        {children}
+      </div>
+    </div>
+  )
+}
 
 /**
  * 导航文件夹（递归）
@@ -79,7 +113,7 @@ const NavPostItem = props => {
           siteConfig('GITBOOK_LATEST_POST_RED_BADGE') &&
           !expanded && <Badge />}
       </div>
-      <Collapse isOpen={expanded} onHeightChange={onHeightChange}>
+      <NavCollapse isOpen={expanded} onHeightChange={onHeightChange}>
         {node.entries.map((entry, index) =>
           entry.type === 'folder' ? (
             <div
@@ -101,7 +135,7 @@ const NavPostItem = props => {
             </div>
           )
         )}
-      </Collapse>
+      </NavCollapse>
     </>
   )
 }

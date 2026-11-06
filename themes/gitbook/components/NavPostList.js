@@ -5,8 +5,9 @@ import { useEffect, useMemo, useState } from 'react'
 import CONFIG from '../config'
 import {
   buildNavTree,
-  collectFolderIds,
-  findActiveFolderIds
+  findActiveFolderIds,
+  resolveCategoryOrder,
+  toggleExpandedIds
 } from '../navTree'
 import BlogPostCard from './BlogPostCard'
 import NavPostItem from './NavPostItem'
@@ -27,7 +28,14 @@ const NavPostList = props => {
   const separator = siteConfig('GITBOOK_CATEGORY_SEPARATOR', '>', CONFIG)
   const maxDepth = siteConfig('GITBOOK_NAV_MAX_DEPTH', 4, CONFIG)
   const AUTO_SORT = siteConfig('GITBOOK_AUTO_SORT', true, CONFIG)
-  const order = siteConfig('GITBOOK_CATEGORY_ORDER', [], CONFIG)
+  // 排序列表每次渲染可能是新数组引用；按内容生成稳定的 key，避免导航树被反复重建
+  const orderKey = resolveCategoryOrder(
+    siteConfig('GITBOOK_CATEGORY_ORDER', [], CONFIG)
+  ).join('\u0000')
+  const orderList = useMemo(
+    () => (orderKey ? orderKey.split('\u0000') : []),
+    [orderKey]
+  )
 
   // 按分类构建导航树（一级 > 二级 > ...）
   const navTree = useMemo(
@@ -36,9 +44,9 @@ const NavPostList = props => {
         separator,
         maxDepth,
         autoSort: AUTO_SORT,
-        order
+        order: orderList
       }),
-    [filteredNavPages, separator, maxDepth, AUTO_SORT, order]
+    [filteredNavPages, separator, maxDepth, AUTO_SORT, orderList]
   )
 
   // 存放被展开的文件夹 id
@@ -53,6 +61,7 @@ const NavPostList = props => {
 
   useEffect(() => {
     // 展开当前文章所在的整条路径；找不到则展开第一个文件夹
+    // 只在路由变化或导航树变化时执行，用户点击展开/收起不会触发（否则会被重置）
     const timer = setTimeout(() => {
       const currentPath = decodeURIComponent(router.asPath.split('?')[0])
       const activeIds = findActiveFolderIds(
@@ -67,27 +76,13 @@ const NavPostList = props => {
       )
     }, 500)
     return () => clearTimeout(timer)
-  }, [router, navTree])
+  }, [router.asPath, navTree])
 
   // 折叠项切换：node 为被点击的文件夹，siblings 为同级文件夹
   const toggleFolder = (node, siblings) => {
-    setExpandedIds(prev => {
-      if (prev.includes(node.id)) {
-        return prev.filter(id => id !== node.id)
-      }
-      let next = prev
-      if (GITBOOK_EXCLUSIVE_COLLAPSE) {
-        // 排他：关闭同级其它文件夹及其子孙
-        const drop = new Set()
-        siblings.forEach(sibling => {
-          if (sibling.id === node.id) return
-          drop.add(sibling.id)
-          collectFolderIds(sibling).forEach(id => drop.add(id))
-        })
-        next = prev.filter(id => !drop.has(id))
-      }
-      return [...next, node.id]
-    })
+    setExpandedIds(prev =>
+      toggleExpandedIds(prev, node, siblings, GITBOOK_EXCLUSIVE_COLLAPSE)
+    )
   }
 
   // 如果href
