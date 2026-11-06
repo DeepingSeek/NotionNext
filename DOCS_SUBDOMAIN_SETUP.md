@@ -8,6 +8,33 @@
 
 ---
 
+## 状态（2026-11-05）
+
+已完成，验证通过。
+
+| 步骤 | 结果 |
+|---|---|
+| 第 3 步：Notion 文档库与两个 Config 表 | 已完成 |
+| 第 4 步：推送 `next.config.js` 与本手册 | 已完成，提交 `ffcf8c27`，已推送到 `origin/main` |
+| 第 6.1 步：Vercel 添加 `docs.lunalight.top` | 已完成 |
+| 第 6.2 步：Spaceship 添加 `docs` CNAME | 已完成，指向 `fededb2c252ec933.vercel-dns-017.com.`，解析到 `216.198.79.65` / `64.29.17.65` |
+| 第 5 步：修改 `NOTION_PAGE_ID` | 已完成 |
+| 第 7 步：重新部署 | 已完成 |
+| 第 8 步：验证 | 已通过，结果见下表 |
+
+验证记录（2026-11-05 实测）：
+
+| 检查项 | 结果 |
+|---|---|
+| `https://docs.lunalight.top/` | 200，页面为 gitbook 主题 |
+| `https://docs.lunalight.top/about` | 200 |
+| `https://www.lunalight.top/` | 200，页面为 heo 主题 |
+| `https://lunalight.top/` | 308 跳转到 `https://www.lunalight.top/` |
+
+**待确认的问题：** 裸域名 `lunalight.top` 当前跳转到 `www`。DOMAIN_MIGRATION.md 阶段 A3 的计划是 `www` 跳转到裸域名 `lunalight.top`，两者方向相反。这个问题与 docs 站无关。请在 Vercel → Settings → Domains 中核对 `lunalight.top` 与 `www.lunalight.top` 的 Redirect 设置，确认哪个是主域名。
+
+---
+
 ## 0. 原理与最终结构
 
 ```text
@@ -73,7 +100,7 @@ NOTION_PAGE_ID = 32d70d5879c883dfbadc81e39bca06f0,docs:6e670d5879c8839d844901b77
 | `slug` | 访问路径。文档首页必须有一篇 `slug` 为 `about` 的页面 |
 | `type` | `Post`（文章）、`Page`（单页，如 about）、`Config`（配置页，只保留一个） |
 | `status` | 要展示的内容设为 `Published`；`Invisible` 为隐藏发布；其它值不展示 |
-| `category` | 决定左侧一级目录（gitbook 按分类分组） |
+| `category` | 决定左侧一级目录（gitbook 按分类分组）。格式与分隔符见 [DOCS_CONTENT_SPEC.md](DOCS_CONTENT_SPEC.md) |
 | `date` | 日期 |
 
 - 至少建一篇 `slug=about`、`type=Page`、`status=Published` 的关于页，否则文档首页找不到。
@@ -193,7 +220,8 @@ Vercel → **Deployments** → 最新一次 → **⋯** → **Redeploy**，取�
 Windows PowerShell 中请用 `curl.exe`，避免被识别为 `Invoke-WebRequest`。
 
 ```bash
-curl -I https://lunalight.top/           # 期望 200
+curl -I https://lunalight.top/           # 当前实际：308 跳转到 www.lunalight.top，待核对（见顶部状态）
+curl -I https://www.lunalight.top/       # 期望 200，主站 heo
 curl -I https://docs.lunalight.top/      # 期望 200
 curl -I https://docs.lunalight.top/about # 期望 200
 nslookup docs.lunalight.top              # 期望返回 Vercel 给出的 CNAME
@@ -204,7 +232,7 @@ nslookup docs.lunalight.top              # 期望返回 Vercel 给出的 CNAME
 - [ ] `docs.lunalight.top` 是 gitbook 布局：左侧分类目录，首页为 about 页。
 - [ ] docs 站内点击目录与文章，地址始终在 `docs.lunalight.top` 下，不会跳回主站。
 - [ ] docs 站的标题、描述、图标与文档库根页面的设置一致。
-- [ ] 两个站的 https 证书有效，`www.lunalight.top` 仍跳转到主域名。
+- [ ] 两个站的 https 证书有效。裸域名与 `www` 的跳转方向待核对（见顶部状态）。
 
 ---
 
