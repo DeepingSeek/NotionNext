@@ -377,6 +377,14 @@ const getSEOMeta = (props, router, locale) => {
         slug: '',
         type: 'website'
       }
+    case '/leaderboard':
+      return {
+        title: `${siteInfo?.title} | 榜单`,
+        description: `${siteInfo?.description}`,
+        image: `${siteInfo?.pageCover}`,
+        slug: 'leaderboard',
+        type: 'website'
+      }
     case '/archive':
       return {
         title: `${locale.NAV.ARCHIVE} | ${siteInfo?.title}`,

@@ -6,6 +6,7 @@ import { siteConfig } from '@/lib/config'
 import { formatDateFmt } from '@/lib/utils/formatDate'
 import SmartLink from '@/components/SmartLink'
 import WavesArea from './WavesArea'
+import CONFIG from '../config'
 
 /**
  * 文章页头
@@ -19,6 +20,9 @@ export default function PostHeader({ post, siteInfo, isDarkMode, lock }) {
   // 文章头图
   const headerImage = post?.pageCover ? post.pageCover : siteInfo?.pageCover
   const ANALYTICS_BUSUANZI_ENABLE = siteConfig('ANALYTICS_BUSUANZI_ENABLE')
+  // 封面模糊半径与遮罩强度，可在 themes/heo/config.js 中调整
+  const coverBlur = Math.max(0, Number(siteConfig('HEO_POST_COVER_BLUR', 14, CONFIG)) || 0)
+  const coverOverlay = Math.min(1, Math.max(0, Number(siteConfig('HEO_POST_COVER_OVERLAY', 0.4, CONFIG)) || 0))
   return (
     <div
       id='post-bg'
@@ -28,35 +32,34 @@ export default function PostHeader({ post, siteInfo, isDarkMode, lock }) {
           ? 'var(--heo-color-accent)'
           : 'var(--heo-color-primary)'
       }}>
-      <style jsx>{`
-        .coverdiv:after {
-          position: absolute;
-          content: '';
-          width: 100%;
-          height: 100%;
-          top: 0;
-          left: 0;
-          box-shadow: 110px -130px 500px 100px
-            var(--heo-post-bg-accent) inset;
-        }
-      `}</style>
-
       <div
         className='absolute top-0 w-full h-full py-10 flex justify-center items-center'
         style={{ backgroundColor: 'var(--heo-post-bg-accent)' }}>
-        {/* 文章背景图 */}
-        <div
-          id='post-cover-wrapper'
-          style={{
-            filter: 'blur(15px)'
-          }}
-          className='coverdiv lg:opacity-50 lg:translate-x-96 lg:rotate-12'>
-          <LazyImage
-            id='post-cover'
-            className='w-full h-full object-cover max-h-[50rem] min-w-[50vw] min-h-[20rem]'
-            src={headerImage}
+        {/* 文章背景图：铺满头部区域，任意尺寸的封面都通过 object-cover 裁切填充；
+            -inset-10 让模糊产生的边缘落在可视区域之外，避免四周发虚 */}
+        {headerImage && (
+          <div
+            id='post-cover-wrapper'
+            className='absolute -inset-10'
+            style={coverBlur > 0 ? { filter: `blur(${coverBlur}px)` } : undefined}>
+            <LazyImage
+              id='post-cover'
+              priority
+              className='w-full h-full object-cover'
+              src={headerImage}
+            />
+          </div>
+        )}
+
+        {/* 暗色渐变遮罩，保证白色标题与导航在任何封面上都清晰可读；强度由 HEO_POST_COVER_OVERLAY 控制 */}
+        {headerImage && coverOverlay > 0 && (
+          <div
+            className='absolute inset-0 pointer-events-none'
+            style={{
+              background: `linear-gradient(to bottom, rgba(0,0,0,${(coverOverlay * 0.75).toFixed(3)}), rgba(0,0,0,${coverOverlay}), rgba(0,0,0,${Math.min(1, coverOverlay * 1.5).toFixed(3)}))`
+            }}
           />
-        </div>
+        )}
 
         {/* 文章文字描述 */}
         <div
