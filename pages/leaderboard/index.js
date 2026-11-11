@@ -41,9 +41,7 @@ const LeaderboardPage = props => {
       </Head>
       <main className='w-full'>
         <LeaderboardIntro
-          sourceName={sourceName}
           syncedAt={leaderboard.syncedAt}
-          indexVersion={leaderboard.indexVersion}
           stale={leaderboard.stale}
           rankIssue={leaderboard.rankIssue}
         />

@@ -1,6 +1,7 @@
 import {
   buildBoardQuery,
   buildLeaderboard,
+  cleanModelName,
   filterLeaderboardRows,
   formatMetric,
   formatSyncedAt,
@@ -51,6 +52,28 @@ describe('parseNullableNumber', () => {
     expect(parseNullableNumber(Number.NaN)).toBeNull()
   })
 })
+
+describe('cleanModelName', () => {
+  it('keeps only the reasoning level in the trailing parentheses', () => {
+    expect(cleanModelName('Claude Fable 5.2 (Max, Default Fallback)')).toBe('Claude Fable 5.2 (Max)')
+    expect(cleanModelName('Claude Opus 5.5 (max with fallback)')).toBe('Claude Opus 5.5 (max)')
+    expect(cleanModelName('Gemini 4 Carbon (High)')).toBe('Gemini 4 Carbon (High)')
+    expect(cleanModelName('DeepSeek V4.1 Flash 1017 (Non-reasoning)')).toBe('DeepSeek V4.1 Flash 1017 (Non-reasoning)')
+  })
+
+  it('drops parentheses without a reasoning level and keeps names without parentheses', () => {
+    expect(cleanModelName('Qwen3.8 Max (0902)')).toBe('Qwen3.8 Max')
+    expect(cleanModelName('Kimi K3.1 Pro')).toBe('Kimi K3.1 Pro')
+  })
+})
+
+describe('normalizeLeaderboardRow', () => {
+  it('applies cleanModelName to the display name', () => {
+    const row = normalizeLeaderboardRow(raw({ Name: 'GPT-6 Astra (Max, Default Fallback)', Rank: '1' }))
+    expect(row.name).toBe('GPT-6 Astra (Max)')
+  })
+})
+
 
 describe('normalizeLeaderboardRow', () => {
   it('maps a complete row', () => {

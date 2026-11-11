@@ -33,7 +33,7 @@ const bodyRowNames = () => {
   return within(table)
     .getAllByRole('row')
     .slice(1)
-    .map(tr => within(tr).getAllByRole('cell')[1].querySelector('div').textContent)
+    .map(tr => within(tr).getAllByRole('cell')[1].querySelector('.font-medium').textContent)
 }
 
 const sortChip = name =>

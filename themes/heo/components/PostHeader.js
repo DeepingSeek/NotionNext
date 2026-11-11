@@ -21,7 +21,7 @@ export default function PostHeader({ post, siteInfo, isDarkMode, lock }) {
   const headerImage = post?.pageCover ? post.pageCover : siteInfo?.pageCover
   const ANALYTICS_BUSUANZI_ENABLE = siteConfig('ANALYTICS_BUSUANZI_ENABLE')
   // 封面模糊半径与遮罩强度，可在 themes/heo/config.js 中调整
-  const coverBlur = Math.max(0, Number(siteConfig('HEO_POST_COVER_BLUR', 14, CONFIG)) || 0)
+  const coverBlur = Math.max(0, Number(siteConfig('HEO_POST_COVER_BLUR', 6, CONFIG)) || 0)
   const coverOverlay = Math.min(1, Math.max(0, Number(siteConfig('HEO_POST_COVER_OVERLAY', 0.4, CONFIG)) || 0))
   return (
     <div

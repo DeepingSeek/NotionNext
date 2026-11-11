@@ -24,8 +24,22 @@ export function Metric({ value, digits }) {
   )
 }
 
-export function RankBadge({ rank }) {
-  if (rank <= 3) {
+export function BrandLogo({ brand }) {
+  if (!brand) return null
+  return (
+    <img
+      src={brand.logo}
+      alt=''
+      width={20}
+      height={20}
+      loading='lazy'
+      className='h-5 w-5 shrink-0 object-contain'
+    />
+  )
+}
+
+export function RankBadge({ rank, circled = true }) {
+  if (circled && rank <= 3) {
     return (
       <span className='inline-flex h-7 w-7 items-center justify-center rounded-full bg-dark text-xs font-bold text-white dark:border dark:border-gray-100 dark:bg-transparent dark:text-gray-100'>
         {rank}

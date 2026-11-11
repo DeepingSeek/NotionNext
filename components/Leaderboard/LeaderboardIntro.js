@@ -1,13 +1,11 @@
 import { formatSyncedAt } from '@/lib/db/leaderboard/mapping'
 import { IconAlertTriangle } from '@tabler/icons-react'
 
-const LeaderboardIntro = ({ sourceName, syncedAt, indexVersion, stale, rankIssue }) => (
+const LeaderboardIntro = ({ syncedAt, stale, rankIssue }) => (
   <header>
-    <h1 className='text-3xl font-bold text-dark dark:text-white lg:text-4xl'>
-      {sourceName} 榜单 Top 100
-    </h1>
-    <p className='mt-3 max-w-3xl text-base leading-relaxed text-body-color dark:text-gray-400'>
-      汇总{sourceName}的模型综合智能指数、价格、输出速度与首字延迟，默认按综合分排序。数据定期同步。
+    <h1 className='text-3xl font-bold text-dark dark:text-white lg:text-4xl'>AI 模型排行榜</h1>
+    <p className='mt-3 max-w-3xl text-sm leading-relaxed text-body-color dark:text-gray-400'>
+      只用第三方评测机构自己给模型实测的成绩，厂商自己公布的分数一概不计
     </p>
     <dl className='mt-6 flex flex-wrap gap-x-8 gap-y-2 text-sm'>
       <div className='flex gap-2'>
@@ -15,10 +13,6 @@ const LeaderboardIntro = ({ sourceName, syncedAt, indexVersion, stale, rankIssue
         <dd className='font-medium tabular-nums text-dark dark:text-gray-200'>
           {formatSyncedAt(syncedAt) || '—'}
         </dd>
-      </div>
-      <div className='flex gap-2'>
-        <dt className='text-body-color dark:text-gray-400'>指数版本</dt>
-        <dd className='font-medium tabular-nums text-dark dark:text-gray-200'>{indexVersion ?? '—'}</dd>
       </div>
     </dl>
     {stale && (

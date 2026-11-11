@@ -144,7 +144,8 @@ describe('LeaderboardPage', () => {
   it('hides attribution by default', () => {
     render(<LeaderboardPage {...baseProps} leaderboard={okBoard} />)
 
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('国内MIT 榜单 Top 100')
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('AI 模型排行榜')
+    expect(screen.queryByText(/指数版本/)).toBeNull()
     expect(screen.getByRole('table')).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: '国内MIT' })).toBeNull()
     expect(screen.queryByText('MIT License 声明')).toBeNull()

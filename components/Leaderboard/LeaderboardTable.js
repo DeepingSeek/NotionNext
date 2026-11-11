@@ -1,5 +1,6 @@
 import { SORT_SPECS } from '@/lib/db/leaderboard/mapping'
-import { FOCUS_RING, METRICS, Metric, RankBadge } from './shared'
+import { getBrand, getBrandTint } from './brands'
+import { BrandLogo, FOCUS_RING, METRICS, Metric, RankBadge } from './shared'
 
 const COLUMNS = [
   { id: 'rank', label: '排名' },
@@ -19,7 +20,7 @@ const TOP_HIGHLIGHT_RANK = 5
 const LeaderboardTable = ({ rows, sortKey, onSortChange }) => (
   <div className='-mx-4 hidden overflow-x-auto px-4 lg:mx-0 lg:block lg:px-0'>
     <table className='w-full min-w-[52rem] border-collapse text-sm'>
-      <caption className='sr-only'>国内MIT 模型榜单，按当前排序显示</caption>
+      <caption className='sr-only'>AI 模型排行榜，按当前排序显示</caption>
       <thead>
         <tr className='border-b border-gray-200 text-left text-body-color dark:border-gray-800 dark:text-gray-400'>
           {COLUMNS.map(column => {
@@ -63,37 +64,49 @@ const LeaderboardTable = ({ rows, sortKey, onSortChange }) => (
       </thead>
       <tbody>
         {rows.map(row => {
-          const highlight = row.rank <= TOP_HIGHLIGHT_RANK
-          const rowBg = highlight ? 'bg-gray-50 dark:bg-gray-900' : 'bg-white dark:bg-gray-950'
+          const brand = getBrand(row.creator)
+          const top = Boolean(brand) && row.rank <= TOP_HIGHLIGHT_RANK
+          const tint = getBrandTint(brand, top)
+          const rankStyle = brand ? { ...tint, boxShadow: `inset 3px 0 0 ${brand.color}` } : undefined
           return (
-            <tr
-              key={row.id}
-              className={`border-b border-gray-200 dark:border-gray-800 ${highlight ? 'bg-gray-50 dark:bg-gray-900' : ''}`}>
+            <tr key={row.id} className='border-b border-gray-200 dark:border-gray-800'>
+              <td className='sticky left-0 z-0 w-14 bg-white py-3 pr-3 align-middle dark:bg-gray-950' style={rankStyle}>
+                <RankBadge rank={row.rank} circled={top} />
+              </td>
+              <td className='sticky left-14 z-0 w-56 bg-white py-3 pr-4 align-middle dark:bg-gray-950' style={tint}>
+                <div className='flex items-center gap-2.5'>
+                  <BrandLogo brand={brand} />
+                  <div className='min-w-0'>
+                    <div className='font-medium text-dark dark:text-gray-100'>{row.name}</div>
+                    {row.creator && (
+                      <div className='text-xs text-body-color dark:text-gray-400'>{row.creator}</div>
+                    )}
+                  </div>
+                </div>
+              </td>
               <td
-                className={`sticky left-0 z-0 w-14 py-3 pr-3 align-middle ${rowBg} ${
-                  highlight ? 'border-l-2 border-primary' : 'border-l-2 border-transparent'
-                }`}>
-                <RankBadge rank={row.rank} />
-              </td>
-              <td className={`sticky left-14 z-0 w-56 py-3 pr-4 align-middle ${rowBg}`}>
-                <div className='font-medium text-dark dark:text-gray-100'>{row.name}</div>
-                {row.creator && (
-                  <div className='text-xs text-body-color dark:text-gray-400'>{row.creator}</div>
-                )}
-              </td>
-              <td className='py-3 pl-3 text-right align-middle font-semibold tabular-nums text-dark dark:text-white'>
+                className='py-3 pl-3 text-right align-middle font-semibold tabular-nums text-dark dark:text-white'
+                style={tint}>
                 <Metric value={row.intelligence} digits={METRICS.intelligence.digits} />
               </td>
-              <td className='py-3 pl-3 text-right align-middle tabular-nums text-dark dark:text-gray-200'>
+              <td
+                className='py-3 pl-3 text-right align-middle tabular-nums text-dark dark:text-gray-200'
+                style={tint}>
                 <Metric value={row.inputPrice} digits={METRICS.inputPrice.digits} />
               </td>
-              <td className='py-3 pl-3 text-right align-middle tabular-nums text-dark dark:text-gray-200'>
+              <td
+                className='py-3 pl-3 text-right align-middle tabular-nums text-dark dark:text-gray-200'
+                style={tint}>
                 <Metric value={row.outputPrice} digits={METRICS.outputPrice.digits} />
               </td>
-              <td className='py-3 pl-3 text-right align-middle tabular-nums text-dark dark:text-gray-200'>
+              <td
+                className='py-3 pl-3 text-right align-middle tabular-nums text-dark dark:text-gray-200'
+                style={tint}>
                 <Metric value={row.outputTps} digits={METRICS.outputTps.digits} />
               </td>
-              <td className='py-3 pl-3 text-right align-middle tabular-nums text-dark dark:text-gray-200'>
+              <td
+                className='py-3 pl-3 text-right align-middle tabular-nums text-dark dark:text-gray-200'
+                style={tint}>
                 <Metric value={row.ttft} digits={METRICS.ttft.digits} />
               </td>
             </tr>
