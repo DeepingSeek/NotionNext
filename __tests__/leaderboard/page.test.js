@@ -66,7 +66,7 @@ describe('leaderboard getStaticProps', () => {
 
     const result = await getStaticProps({ locale: 'zh-CN' })
 
-    expect(result).toEqual({ notFound: true, revalidate: 86400 })
+    expect(result).toEqual({ notFound: true, revalidate: 3600 })
     expect(getLeaderboardBoard).not.toHaveBeenCalled()
   })
 

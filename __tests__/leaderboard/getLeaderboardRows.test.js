@@ -85,7 +85,7 @@ describe('getLeaderboardRawRows', () => {
 
     const rows = await getLeaderboardRawRows(TABLE_URL)
 
-    expect(fetchNotionPageBlocks).toHaveBeenCalledWith(PAGE_ID, 'leaderboard')
+    expect(fetchNotionPageBlocks).toHaveBeenCalledWith(PAGE_ID, 'leaderboard', { cacheTtl: 3600 })
     expect(rows).toEqual([
       { id: 'row-1', Name: 'Model A', Rank: '1', Active: 'Yes', 'Synced At': '2026-11-10' },
       { id: 'row-2', Name: 'Model B', Rank: '2', Active: '', 'Synced At': '2026-11-10' }

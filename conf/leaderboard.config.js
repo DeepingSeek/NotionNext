@@ -5,7 +5,7 @@
 module.exports = {
   LEADERBOARD_ENABLE: false, // 是否开启榜单页面；关闭时 /leaderboard 返回 404
   LEADERBOARD_TABLE_URL: '', // 榜单库的 Notion 链接（已分享到网页），形如 https://www.notion.so/...-<32位页面ID>
-  LEADERBOARD_REVALIDATE_SECOND: 86400, // 榜单页 ISR 刷新间隔（秒）
+  LEADERBOARD_REVALIDATE_SECOND: 3600, // 榜单页 ISR 刷新间隔（秒）
   LEADERBOARD_SHOW_ATTRIBUTION: false, // 是否在页脚显示署名与许可声明；暂不显示
   LEADERBOARD_SOURCE_NAME: '国内MIT', // 数据来源名称，用于页面标题与署名
   LEADERBOARD_SOURCE_URL: '', // 数据来源链接；为空时不显示链接
