@@ -5,10 +5,10 @@ export const FOCUS_RING =
 
 export const METRICS = {
   intelligence: { label: '综合分', digits: 1 },
-  inputPrice: { label: '输入价格（美元 / 百万 tokens）', digits: 2 },
-  outputPrice: { label: '输出价格（美元 / 百万 tokens）', digits: 2 },
-  outputTps: { label: '输出速度（TPS）', digits: 1 },
-  ttft: { label: '首字延迟（秒）', digits: 2 }
+  inputPrice: { label: '输入价格', unit: '$ / M tokens', title: '输入价格（美元 / 百万 tokens）', digits: 2 },
+  outputPrice: { label: '输出价格', unit: '$ / M tokens', title: '输出价格（美元 / 百万 tokens）', digits: 2 },
+  outputTps: { label: '输出速度', unit: 'TPS', digits: 1 },
+  ttft: { label: '首字延迟', unit: '秒', digits: 2 }
 }
 
 /**

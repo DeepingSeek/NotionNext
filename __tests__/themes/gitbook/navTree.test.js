@@ -350,4 +350,23 @@ describe('sortNavTree / buildNavTree 的 order 选项', () => {
       '附录'
     ])
   })
+
+  it('默认配置下，二级序号文件夹按序号排列，不依赖 Notion 行顺序', () => {
+    const CONFIG = require('@/themes/gitbook/config').default
+    const posts = [
+      post('a', 'Microsoft Foundry > 6_开发工具 > 参考'),
+      post('b', 'Microsoft Foundry > 1_模型与部署 > 参考'),
+      post('c', 'Microsoft Foundry > 0_总览 > 概念解释'),
+      post('d', 'Microsoft Foundry > 2_Agent Service > 教程'),
+      post('e', '样例与学习资源 > 2_样例仓库 > 参考'),
+      post('f', '样例与学习资源 > 0_官方入口 > 参考'),
+      post('g', '样例与学习资源 > 3_课程与路径 > 参考'),
+      post('h', '样例与学习资源 > 1_客户工具 > 参考')
+    ]
+    const root = buildNavTree(posts, { order: CONFIG.GITBOOK_CATEGORY_ORDER })
+    const foundry = root.entries.find(e => e.name === 'Microsoft Foundry')
+    const samples = root.entries.find(e => e.name === '样例与学习资源')
+    expect(foundry.entries.map(e => e.name)).toEqual(['0_总览', '1_模型与部署', '2_Agent Service', '6_开发工具'])
+    expect(samples.entries.map(e => e.name)).toEqual(['0_官方入口', '1_客户工具', '2_样例仓库', '3_课程与路径'])
+  })
 })

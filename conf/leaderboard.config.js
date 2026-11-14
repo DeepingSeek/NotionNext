@@ -10,5 +10,5 @@ module.exports = {
   LEADERBOARD_SOURCE_NAME: '国内MIT', // 数据来源名称，用于页面标题与署名
   LEADERBOARD_SOURCE_URL: '', // 数据来源链接；为空时不显示链接
   LEADERBOARD_LICENSE_NOTICE: '', // 许可声明文本；为空时不显示许可声明
-  LEADERBOARD_MENU_NAME: '榜单' // 开关开启时导航中显示的名称
+  LEADERBOARD_MENU_NAME: 'AI模型榜单' // 开关开启时导航中显示的名称
 }

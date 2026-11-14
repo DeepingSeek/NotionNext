@@ -2102,6 +2102,25 @@ tbody tr {
   table-layout: fixed;
 }
 
+/* 排行榜需要真实表格布局，否则表头与各行列宽不一致 */
+table.leaderboard-table {
+  display: table;
+}
+
+table.leaderboard-table thead {
+  display: table-header-group;
+}
+
+table.leaderboard-table tbody {
+  display: table-row-group;
+}
+
+table.leaderboard-table tr {
+  display: table-row;
+  width: auto;
+  table-layout: auto;
+}
+
 .notion-collection-card {
   @apply dark:text-gray-200 dark:bg-gray-800 dark:hover:bg-black;
 }

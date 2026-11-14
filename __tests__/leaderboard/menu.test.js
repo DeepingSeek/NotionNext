@@ -12,7 +12,7 @@ describe('appendLeaderboardMenu', () => {
 
     expect(result).toHaveLength(2)
     expect(result[1]).toMatchObject({
-      name: '榜单',
+      name: 'AI模型榜单',
       href: LEADERBOARD_PATH,
       icon: 'fas fa-trophy',
       show: true

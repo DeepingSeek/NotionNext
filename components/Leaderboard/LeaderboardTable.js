@@ -5,11 +5,11 @@ import { BrandLogo, FOCUS_RING, METRICS, Metric, RankBadge } from './shared'
 const COLUMNS = [
   { id: 'rank', label: '排名' },
   { id: 'name', label: '模型' },
-  { id: 'intelligence', label: METRICS.intelligence.label, sortKey: 'intelligence', field: 'intelligence' },
-  { id: 'inputPrice', label: METRICS.inputPrice.label, sortKey: 'price', field: 'inputPrice' },
-  { id: 'outputPrice', label: METRICS.outputPrice.label, field: 'outputPrice' },
-  { id: 'outputTps', label: METRICS.outputTps.label, sortKey: 'speed', field: 'outputTps' },
-  { id: 'ttft', label: METRICS.ttft.label, sortKey: 'ttft', field: 'ttft' }
+  { id: 'intelligence', ...METRICS.intelligence, sortKey: 'intelligence', field: 'intelligence' },
+  { id: 'inputPrice', ...METRICS.inputPrice, sortKey: 'price', field: 'inputPrice' },
+  { id: 'outputPrice', ...METRICS.outputPrice, field: 'outputPrice' },
+  { id: 'outputTps', ...METRICS.outputTps, sortKey: 'speed', field: 'outputTps' },
+  { id: 'ttft', ...METRICS.ttft, sortKey: 'ttft', field: 'ttft' }
 ]
 
 const TOP_HIGHLIGHT_RANK = 5
@@ -19,7 +19,7 @@ const TOP_HIGHLIGHT_RANK = 5
  */
 const LeaderboardTable = ({ rows, sortKey, onSortChange }) => (
   <div className='-mx-4 hidden overflow-x-auto px-4 lg:mx-0 lg:block lg:px-0'>
-    <table className='w-full min-w-[52rem] border-collapse text-sm'>
+    <table className='leaderboard-table w-full min-w-[52rem] border-collapse text-sm'>
       <caption className='sr-only'>AI 模型排行榜，按当前排序显示</caption>
       <thead>
         <tr className='border-b border-gray-200 text-left text-body-color dark:border-gray-800 dark:text-gray-400'>
@@ -38,8 +38,9 @@ const LeaderboardTable = ({ rows, sortKey, onSortChange }) => (
               <th
                 key={column.id}
                 scope='col'
+                title={column.title}
                 aria-sort={isSortable ? (isActive ? direction : 'none') : undefined}
-                className={`py-3 font-semibold whitespace-nowrap ${isNumeric ? 'pl-3 text-right' : 'pr-3'} ${stickyClass}`}>
+                className={`py-3 font-semibold whitespace-nowrap ${isNumeric ? 'px-3 text-center' : 'pr-3'} ${stickyClass}`}>
                 {isSortable ? (
                   <button
                     type='button'
@@ -49,13 +50,21 @@ const LeaderboardTable = ({ rows, sortKey, onSortChange }) => (
                         ? 'font-bold text-dark underline underline-offset-4 dark:text-white'
                         : 'hover:text-dark dark:hover:text-gray-200'
                     }`}>
-                    {column.label}
-                    {isActive && (
-                      <span aria-hidden='true'>{direction === 'ascending' ? '↑' : '↓'}</span>
-                    )}
+                    <span className='flex flex-col items-center leading-tight'>
+                      <span className='inline-flex items-center gap-1'>
+                        {column.label}
+                        {isActive && (
+                          <span aria-hidden='true'>{direction === 'ascending' ? '↑' : '↓'}</span>
+                        )}
+                      </span>
+                      {column.unit && <span className='text-xs font-normal text-body-color'>{column.unit}</span>}
+                    </span>
                   </button>
                 ) : (
-                  column.label
+                  <span className='flex flex-col items-center leading-tight'>
+                    {column.label}
+                    {column.unit && <span className='text-xs font-normal text-body-color'>{column.unit}</span>}
+                  </span>
                 )}
               </th>
             )
@@ -67,10 +76,9 @@ const LeaderboardTable = ({ rows, sortKey, onSortChange }) => (
           const brand = getBrand(row.creator)
           const top = Boolean(brand) && row.rank <= TOP_HIGHLIGHT_RANK
           const tint = getBrandTint(brand, top)
-          const rankStyle = brand ? { ...tint, boxShadow: `inset 3px 0 0 ${brand.color}` } : undefined
           return (
             <tr key={row.id} className='border-b border-gray-200 dark:border-gray-800'>
-              <td className='sticky left-0 z-0 w-14 bg-white py-3 pr-3 align-middle dark:bg-gray-950' style={rankStyle}>
+              <td className='sticky left-0 z-0 w-14 bg-white py-3 pr-3 align-middle dark:bg-gray-950' style={tint}>
                 <RankBadge rank={row.rank} circled={top} />
               </td>
               <td className='sticky left-14 z-0 w-56 bg-white py-3 pr-4 align-middle dark:bg-gray-950' style={tint}>
@@ -85,27 +93,27 @@ const LeaderboardTable = ({ rows, sortKey, onSortChange }) => (
                 </div>
               </td>
               <td
-                className='py-3 pl-3 text-right align-middle font-semibold tabular-nums text-dark dark:text-white'
+                className='py-3 px-3 text-center align-middle font-semibold tabular-nums text-dark dark:text-white'
                 style={tint}>
                 <Metric value={row.intelligence} digits={METRICS.intelligence.digits} />
               </td>
               <td
-                className='py-3 pl-3 text-right align-middle tabular-nums text-dark dark:text-gray-200'
+                className='py-3 px-3 text-center align-middle tabular-nums text-dark dark:text-gray-200'
                 style={tint}>
                 <Metric value={row.inputPrice} digits={METRICS.inputPrice.digits} />
               </td>
               <td
-                className='py-3 pl-3 text-right align-middle tabular-nums text-dark dark:text-gray-200'
+                className='py-3 px-3 text-center align-middle tabular-nums text-dark dark:text-gray-200'
                 style={tint}>
                 <Metric value={row.outputPrice} digits={METRICS.outputPrice.digits} />
               </td>
               <td
-                className='py-3 pl-3 text-right align-middle tabular-nums text-dark dark:text-gray-200'
+                className='py-3 px-3 text-center align-middle tabular-nums text-dark dark:text-gray-200'
                 style={tint}>
                 <Metric value={row.outputTps} digits={METRICS.outputTps.digits} />
               </td>
               <td
-                className='py-3 pl-3 text-right align-middle tabular-nums text-dark dark:text-gray-200'
+                className='py-3 px-3 text-center align-middle tabular-nums text-dark dark:text-gray-200'
                 style={tint}>
                 <Metric value={row.ttft} digits={METRICS.ttft.digits} />
               </td>
